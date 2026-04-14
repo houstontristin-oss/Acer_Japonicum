@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import arcade
 
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
@@ -22,6 +24,9 @@ from views.gameplay_view import GameplayView
 from views.load_view import LoadView
 from views.settings_view import SettingsView
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+MENU_BACKGROUND_IMAGE = PROJECT_ROOT / "assets" / "images" / "background.jpg"
+
 
 class MenuButton:
     def __init__(self, label: str, center_x: float, center_y: float, width: float, height: float):
@@ -30,6 +35,16 @@ class MenuButton:
         self.center_y = center_y
         self.width = width
         self.height = height
+        self.text = arcade.Text(
+            self.label,
+            self.center_x,
+            self.center_y,
+            (235, 244, 237),
+            font_size=18,
+            anchor_x="center",
+            anchor_y="center",
+            bold=True,
+        )
 
         self.visible = False
         self.alpha = 0
@@ -60,7 +75,7 @@ class MenuButton:
         if not self.visible:
             return
 
-        fill = (28, 34, 40, self.alpha)
+        fill = (24, 28, 32, self.alpha)
         border = (170, 215, 198, self.alpha)
         text_color = (235, 244, 237, self.alpha)
 
@@ -83,6 +98,34 @@ class TitleMenuView(arcade.View):
     def __init__(self) -> None:
         super().__init__()
 
+        self.title_text = arcade.Text(
+            "The Maju Mellenia",
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT - 110,
+            arcade.color.WHITE,
+            font_size=48,
+            anchor_x="center",
+            bold=True,
+        )
+
+        self.subtitle_text = arcade.Text(
+            "Your call to action is now",
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT - 150,
+            (190, 215, 205),
+            font_size=15,
+            anchor_x="center",
+        )
+
+        self.main_menu_text = arcade.Text(
+            "Main Menu",
+            SCREEN_WIDTH / 2,
+            0,
+            (235, 244, 237),
+            font_size=24,
+            anchor_x="center",
+            bold=True,
+        )
         self.panel_width = MENU_PANEL_WIDTH
         self.panel_height = MENU_PANEL_HEIGHT
 
@@ -96,6 +139,11 @@ class TitleMenuView(arcade.View):
         self.button_anim_duration = MENU_BUTTON_ANIM_DURATION
         self.button_time = 0.0
 
+        self.menu_background_texture = None
+        self.menu_background_sprite = None
+        self.menu_background_sprites = arcade.SpriteList()
+        self._load_menu_background()
+
         center_x = SCREEN_WIDTH / 2
         base_y = SCREEN_HEIGHT / 2 - 35
         gap = MENU_BUTTON_GAP
@@ -108,6 +156,24 @@ class TitleMenuView(arcade.View):
         ]
 
         arcade.set_background_color(TITLE_BACKGROUND_COLOR)
+
+    def _load_menu_background(self) -> None:
+        if not MENU_BACKGROUND_IMAGE.exists():
+            return
+
+        self.menu_background_texture = arcade.load_texture(MENU_BACKGROUND_IMAGE)
+
+        tex_w = self.menu_background_texture.width
+        tex_h = self.menu_background_texture.height
+
+        sprite = arcade.Sprite()
+        sprite.texture = self.menu_background_texture
+        sprite.center_x = SCREEN_WIDTH / 2
+        sprite.center_y = SCREEN_HEIGHT / 2
+        sprite.scale = max(SCREEN_WIDTH / tex_w, SCREEN_HEIGHT / tex_h)
+
+        self.menu_background_sprite = sprite
+        self.menu_background_sprites.append(sprite)
 
     def on_show_view(self) -> None:
         arcade.set_background_color(TITLE_BACKGROUND_COLOR)
@@ -153,26 +219,22 @@ class TitleMenuView(arcade.View):
 
     def _draw_background(self) -> None:
         arcade.draw_lrbt_rectangle_filled(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT, TITLE_BG_FILL)
-        arcade.draw_lrbt_rectangle_filled(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT * 0.24, TITLE_BG_BOTTOM_BAND)
 
-        arcade.draw_text(
-            "The Maju Mellenia",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT - 110,
-            arcade.color.WHITE,
-            font_size=48,
-            anchor_x="center",
-            bold=True,
-        )
+        if len(self.menu_background_sprites) > 0:
+            self.menu_background_sprites.draw()
 
-        arcade.draw_text(
-            "Your call to action is now",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT - 150,
-            (190, 215, 205),
-            font_size=15,
-            anchor_x="center",
-        )
+            arcade.draw_lrbt_rectangle_filled(
+                0,
+                SCREEN_WIDTH,
+                0,
+                SCREEN_HEIGHT,
+                (10, 16, 12, 88),
+            )
+        else:
+            arcade.draw_lrbt_rectangle_filled(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT * 0.24, TITLE_BG_BOTTOM_BAND)
+
+        self.title_text.draw()
+        self.subtitle_text.draw()
 
     def _draw_menu_panel(self) -> None:
         center_x = SCREEN_WIDTH / 2
@@ -181,18 +243,12 @@ class TitleMenuView(arcade.View):
         bottom = self.panel_y - self.panel_height / 2
         top = self.panel_y + self.panel_height / 2
 
-        arcade.draw_lrbt_rectangle_filled(left, right, bottom, top, (18, 22, 28))
+        arcade.draw_lrbt_rectangle_filled(left, right, bottom, top, (18, 22, 28, 214))
         arcade.draw_lrbt_rectangle_outline(left, right, bottom, top, (166, 214, 195), 3)
 
-        arcade.draw_text(
-            "Main Menu",
-            center_x,
-            top - 42,
-            (235, 244, 237),
-            font_size=24,
-            anchor_x="center",
-            bold=True,
-        )
+        self.main_menu_text.x = center_x
+        self.main_menu_text.y = top - 42
+        self.main_menu_text.draw()
 
         for button in self.buttons:
             button.draw()
