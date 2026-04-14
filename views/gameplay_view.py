@@ -26,6 +26,21 @@ class GameplayView(arcade.View):
             height=48,
             speed=260,
         )
+        self.title_text = arcade.Text(
+            "Gameplay Movement Test",
+            20,
+            SCREEN_HEIGHT - 34,
+            arcade.color.WHITE,
+            font_size=20,
+            bold=True,
+        )
+        self.instructions_text = arcade.Text(
+            "Move with WASD or arrow keys   |   ESC = return to menu",
+            20,
+            SCREEN_HEIGHT - 62,
+            (226, 234, 226),
+            font_size=14,
+        )
 
         self.camera = GameCamera()
 
@@ -135,22 +150,8 @@ class GameplayView(arcade.View):
         arcade.draw_line(self.path_right, 0, self.path_right, self.world_height, (82, 60, 36), 3)
 
     def _draw_ui(self) -> None:
-        arcade.draw_text(
-            "Gameplay Movement Test",
-            20,
-            SCREEN_HEIGHT - 34,
-            arcade.color.WHITE,
-            font_size=20,
-            bold=True,
-        )
-
-        arcade.draw_text(
-            "Move with WASD or arrow keys   |   ESC = return to menu",
-            20,
-            SCREEN_HEIGHT - 62,
-            (226, 234, 226),
-            font_size=14,
-        )
+        self.title_text.draw()
+        self.instructions_text.draw()
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         if symbol in (arcade.key.W, arcade.key.UP):

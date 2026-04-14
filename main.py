@@ -37,12 +37,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-    """
-    Must add maple_leaf and background sprite to the list of sprites
-     line 176, in on_draw
-    self._draw_background()
-    line 183, in _draw_background
-    self.menu_background_sprite.draw()
-    
-    """
