@@ -213,7 +213,7 @@ class ForestPathView(arcade.View, ViewTransitionMixin):
             arcade.draw_circle_filled(x + radius * 0.55, y + 20, radius * 0.7, (150, 100, 54))
 
     def _draw_signpost(self) -> None:
-        sign_x = 930
+        sign_x = 1130
         sign_y = 790
 
         arcade.draw_lrbt_rectangle_filled(sign_x - 7, sign_x + 7, sign_y - 20, sign_y + 70, (84, 66, 42))
