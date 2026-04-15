@@ -20,7 +20,7 @@ from view_constants import (
     TITLE_BG_BOTTOM_BAND,
     TITLE_BG_FILL,
 )
-from views.gameplay_view import GameplayView
+from views.home_exterior_view import HomeExteriorView
 from views.load_view import LoadView
 from views.settings_view import SettingsView
 
@@ -261,7 +261,7 @@ class TitleMenuView(arcade.View):
 
     def _handle_button(self, label: str) -> None:
         if label == "Play":
-            self.window.show_view(GameplayView())
+            self.window.show_view(HomeExteriorView())
         elif label == "Load":
             self.window.show_view(LoadView())
         elif label == "Settings":
